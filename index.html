@@ -1,0 +1,177 @@
+
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Гиперссылки и форма</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <header id="header">
+        <div class="header-top">
+            <div class="logo">
+                <img src="logo.png" alt="Логотип">
+                <div class="site-name">Название сайта</div>
+            </div>
+            <nav class="menu">
+                <a href="#">Ссылка меню 1</a>
+                <a href="#">Ссылка 2</a>
+                <a href="#">Ссылка 3</a>
+            </nav>
+        </div>
+    </header>
+
+    <main>
+        <div class="main-container"> 
+            <div class="content-wrapper">
+                <section id="hyperlinks">
+                <h2>Список гиперссылок</h2>
+                <ol>
+                    <li><a href="http://kubsu.ru">Абсолютная гиперссылка на главную страницу сайта kubsu.ru</a></li>
+                    <li><a href="https://www.kubsu.ru/index.php">Абсолютная на главную сайта kubsu.ru в протоколе https</a></li>
+                    <li><a href="https://kubsu.ru/"><img src="image.jpg" alt="Цветочек" width="450"></a></li>
+                    <li><a href="/library">Сокращенная ссылка на внутреннюю страницу</a></li>
+                    <li><a href="/">Сокращенная ссылка на главную страницу КубГУ</a></li>
+                    <li><a href="#form">Ссылка на фрагмент текущей страницы</a></li>
+                    <li><a href="https://example.com/page?param1=value1&param2=value2&param3=value3">Ссылка с тремя параметрами в URL</a></li>
+                    <li><a href="https://www.kubsu.ru/ru/node/38921?id=12345">Ссылка с параметром id в URL</a></li>
+                    <li><a href="page.html">Относительная на страницу в текущем каталоге</a></li>
+                    <li><a href="about/index.html">Относительная на страницу в каталоге about</a></li>
+                    <li><a href="../parent.html">Относительная на страницу в каталоге уровнем выше текущего</a></li>
+                    <li><a href="../../grandparent.html">Относительная на страницу в каталоге двумя уровнями выше</a></li>
+                    <li>Это <a href="https://www.kubsu.ru/ru/abiturient/campaign2025">контекстная ссылка</a> в тексте абзаца.</li>
+                    <li><a href="https://ru.wikipedia.org/wiki/HTML#Версии">Ссылка на фрагмент страницы стороннего сайта</a></li>
+                    <li>
+                        <p>Квадрат - русская версия сайта КУБГУ</p>
+                        <p>Круг - английская версия сайта КУБГУ</p>
+                        <img src="KVandKR.jpg" alt="Квадрат и круг" usemap="#examplemap">
+                        <map name="examplemap">
+                            <area shape="rect" coords="240,25,430,195" href="https://kubsu.ru/" alt="Прямоугольная область" title="https://kubsu.ru">
+                            <area shape="circle" coords="110,110,110" href="https://kubsu.ru/en" alt="Круглая область" title="https://kubsu.ru/en">
+                        </map>
+                    </li>
+                    <li><a href="">Ссылка с пустым href</a></li>
+                    <li><a>Ссылка без href</a></li>
+                    <li><a href="https://www.twitch.tv/" rel="nofollow">Ссылка, по которой запрещен переход поисковикам</a></li>
+                    <li><a href="https://www.leagueoflegends.com/ru-ru/download/" rel="noindex">Запрещенная для индексации поисковиками</a></li>
+                    <li>
+                        <ol>
+                            <li><a href="https://ru.wikipedia.org/wiki/HTML" title="HTML Viki">HTML Viki</a></li>
+                            <li><a href="https://vk.com/fckubsu" title="Fckubsu">Fckubsu</a></li>
+                            <li><a href="https://ru.uefa.com/uefachampionsleague/standings/" title="UEFA">UEFA</a></li>
+                        </ol>
+                    </li>
+                    <li><a href="ftp://user:password@example.com/file.txt">Ссылка на файл на сервере FTP с авторизацией</a></li>
+                </ol>
+            </section>
+
+               <section id="table-section">
+                <h2>Таблица</h2>
+                <table id="custom-table">
+                    <thead>
+                        <tr>
+                            <th>Колонка 1</th>
+                            <th>Колонка 2</th>
+                            <th>Колонка 3</th>
+                            <th>Колонка 4</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>Ячейка 1</td>
+                            <td>Ячейка 2</td>
+                            <td>Ячейка 3</td>
+                            <td>Ячейка 4</td>
+                        </tr>
+                        <tr>
+                            <td>Ячейка 5</td>
+                            <td colspan="2">Объединенная ячейка</td>
+                            <td>Ячейка 8</td>
+                        </tr>
+                        <tr>
+                            <td>Ячейка 9</td>
+                            <td>Ячейка 10</td>
+                            <td>Ячейка 11</td>
+                            <td rowspan="2">Объединенная ячейка</td>
+                        </tr>
+                        <tr>
+                            <td>Ячейка 13</td>
+                            <td>Ячейка 14</td>
+                            <td>Ячейка 15</td>
+                        </tr>
+                        <tr>
+                            <td>Ячейка 17</td>
+                            <td>Ячейка 18</td>
+                            <td>Ячейка 19</td>
+                            <td>Ячейка 20</td>
+                        </tr>
+                        <tr>
+                            <td colspan="4">Объединенная ячейка на всю ширину</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </section>
+
+                <section id="form-section">
+                <h2 id="form">Форма</h2>
+                <form action="#" method="post">
+                    <div>
+                        <label>ФИО:</label>
+                        <input type="text" name="fio" required>
+                    </div>
+                    <div>
+                        <label>Телефон:</label>
+                        <input type="tel" name="phone" required>
+                    </div>
+                    <div>
+                        <label>E-mail:</label>
+                        <input type="email" name="email" required>
+                    </div>
+                    <div>
+                        <label>Дата рождения:</label>
+                        <input type="date" name="birthdate" required>
+                    </div>
+                    <div>
+                        <label>Пол:</label>
+                        <input type="radio" name="gender" value="male" required> Мужской
+                        <input type="radio" name="gender" value="female"> Женский
+                    </div>
+                    <div>
+                        <label>Любимый язык программирования:</label>
+                        <select name="languages" multiple size="5">
+                            <option value="pascal">Pascal</option>
+                            <option value="c">C</option>
+                            <option value="cpp">C++</option>
+                            <option value="javascript">JavaScript</option>
+                            <option value="php">PHP</option>
+                            <option value="python">Python</option>
+                            <option value="java">Java</option>
+                            <option value="haskel">Haskel</option>
+                            <option value="clojure">Clojure</option>
+                            <option value="prolog">Prolog</option>
+                            <option value="scala">Scala</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label>Биография:</label>
+                        <textarea name="bio" rows="5" cols="30"></textarea>
+                    </div>
+                    <div>
+                        <input type="checkbox" name="agreement" required>
+                        <label>С контрактом ознакомлен(а)</label>
+                    </div>
+                    <div>
+                        <button type="submit">Сохранить</button>
+                    </div>
+                </form>
+            </section>
+            </div>
+        </div>
+    </main>
+
+    <footer id="footer">
+        <p>Павлов Артём</p>
+    </footer>
+</body>
+</html>
