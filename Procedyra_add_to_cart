@@ -1,0 +1,17 @@
+CREATE OR REPLACE PROCEDURE add_to_cart (
+    p_customer_id IN NUMBER,
+    p_product_id  IN NUMBER,
+    p_quantity    IN NUMBER
+)
+IS
+    v_id NUMBER;
+BEGIN
+    SELECT NVL(MAX(id), 0) + 1 INTO v_id FROM Cart_Item;
+
+    INSERT INTO Cart_Item (id, customer_id, product_id, order_id, quantity)
+    VALUES (v_id, p_customer_id, p_product_id, NULL, p_quantity);
+
+    DBMS_OUTPUT.PUT_LINE('Товар добавлен в корзину! ID записи: ' || v_id);
+    COMMIT;
+END;
+/
