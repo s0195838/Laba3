@@ -1,17 +1,19 @@
 CREATE OR REPLACE PROCEDURE add_to_cart (
     p_customer_id IN NUMBER,
     p_product_id  IN NUMBER,
-    p_quantity    IN NUMBER
+    p_quantity    IN NUMBER DEFAULT 1
 )
 IS
     v_id NUMBER;
 BEGIN
-    SELECT NVL(MAX(id), 0) + 1 INTO v_id FROM Cart_Item;
-
-    INSERT INTO Cart_Item (id, customer_id, product_id, order_id, quantity)
-    VALUES (v_id, p_customer_id, p_product_id, NULL, p_quantity);
-
-    DBMS_OUTPUT.PUT_LINE('Товар добавлен в корзину! ID записи: ' || v_id);
+    -- Простая генерация ID
+    SELECT NVL(MAX(id), 0) + 1 INTO v_id FROM CART_ITEM;
+    
+    -- Вставка с защитой от NULL
+    INSERT INTO CART_ITEM (id, customer_id, product_id, order_id, quantity)
+    VALUES (v_id, p_customer_id, p_product_id, NULL, NVL(p_quantity, 1));
+    
     COMMIT;
-END;
+    DBMS_OUTPUT.PUT_LINE('Товар добавлен! ID: ' || v_id);
+END add_to_cart;
 /
