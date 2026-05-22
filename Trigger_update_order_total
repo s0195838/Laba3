@@ -1,26 +1,9 @@
-CREATE OR REPLACE TRIGGER trg_update_order_total
-AFTER INSERT OR UPDATE OR DELETE ON Cart_Item
+CREATE OR REPLACE TRIGGER cart_item_trigger
+BEFORE INSERT ON CART_ITEM
 FOR EACH ROW
-DECLARE
-    v_order_id NUMBER;
 BEGIN
-    -- Определяем, какой заказ затронут
-    IF INSERTING OR UPDATING THEN
-        v_order_id := :NEW.order_id;
-    ELSE
-        v_order_id := :OLD.order_id;
-    END IF;
-
-    -- Пересчитываем сумму, если заказ существует
-    IF v_order_id IS NOT NULL THEN
-        UPDATE Orders
-        SET total_amount = (
-            SELECT NVL(SUM(ci.quantity * p.price), 0)
-            FROM Cart_Item ci
-            JOIN Product p ON ci.product_id = p.id
-            WHERE ci.order_id = v_order_id
-        )
-        WHERE id = v_order_id;
+    IF :NEW.id IS NULL THEN
+        SELECT NVL(MAX(id), 0) + 1 INTO :NEW.id FROM CART_ITEM;
     END IF;
 END;
 /
