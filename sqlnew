@@ -1,0 +1,245 @@
+-- 1. Категории
+CREATE TABLE Category (
+    cat_id NUMBER PRIMARY KEY,
+    cat_name VARCHAR2(50) NOT NULL
+);
+
+-- 2. Покупатели
+CREATE TABLE Customer (
+    cust_id NUMBER PRIMARY KEY,
+    name VARCHAR2(100) NOT NULL,
+    email VARCHAR2(100) UNIQUE NOT NULL
+);
+
+-- 3. Товары
+CREATE TABLE Product (
+    prod_id NUMBER PRIMARY KEY,
+    prod_name VARCHAR2(100) NOT NULL,
+    cat_id NUMBER REFERENCES Category(cat_id),
+    price NUMBER(8,2) NOT NULL,
+    stock NUMBER DEFAULT 0
+);
+
+-- 4. Заказы
+CREATE TABLE Orders (
+    order_id NUMBER PRIMARY KEY,
+    cust_id NUMBER REFERENCES Customer(cust_id),
+    order_date DATE DEFAULT SYSDATE,
+    total NUMBER(8,2) DEFAULT 0
+);
+
+-- 5. Корзина (связь заказов с товарами)
+CREATE TABLE Cart_Item (
+    item_id NUMBER PRIMARY KEY,
+    order_id NUMBER REFERENCES Orders(order_id),
+    prod_id NUMBER REFERENCES Product(prod_id),
+    quantity NUMBER NOT NULL
+);
+
+
+
+
+-- Категории
+INSERT INTO Category VALUES (1, 'Электроника');
+INSERT INTO Category VALUES (2, 'Одежда');
+
+-- Покупатели
+INSERT INTO Customer VALUES (1, 'Иван Петров', 'ivan@mail.ru');
+INSERT INTO Customer VALUES (2, 'Мария Сидорова', 'maria@mail.ru');
+
+-- Товары
+INSERT INTO Product VALUES (1, 'Ноутбук', 1, 50000, 5);
+INSERT INTO Product VALUES (2, 'Мышь', 1, 1000, 10);
+INSERT INTO Product VALUES (3, 'Футболка', 2, 1500, 20);
+
+-- Заказы
+INSERT INTO Orders VALUES (1, 1, SYSDATE, 0);
+INSERT INTO Orders VALUES (2, 2, SYSDATE, 0);
+
+-- Корзина (товары в заказе)
+INSERT INTO Cart_Item VALUES (1, 1, 1, 1);
+INSERT INTO Cart_Item VALUES (2, 1, 2, 2);
+INSERT INTO Cart_Item VALUES (3, 2, 3, 3);
+
+
+
+-- Что купил каждый покупатель
+CREATE VIEW Order_Info AS
+SELECT 
+    c.name AS покупатель,
+    p.prod_name AS товар,
+    ci.quantity AS количество,
+    (p.price * ci.quantity) AS сумма
+FROM Customer c
+JOIN Orders o ON c.cust_id = o.cust_id
+JOIN Cart_Item ci ON o.order_id = ci.order_id
+JOIN Product p ON ci.prod_id = p.prod_id;
+
+-- Автоматический подсчёт суммы заказа
+CREATE OR REPLACE TRIGGER calc_total
+AFTER INSERT OR UPDATE OR DELETE ON Cart_Item
+BEGIN
+    FOR rec IN (SELECT DISTINCT order_id FROM Cart_Item) LOOP
+        UPDATE Orders o
+        SET total = (
+            SELECT SUM(p.price * ci.quantity)
+            FROM Cart_Item ci
+            JOIN Product p ON ci.prod_id = p.prod_id
+            WHERE ci.order_id = rec.order_id
+        )
+        WHERE o.order_id = rec.order_id;
+    END LOOP;
+END;
+/
+
+
+
+-- Сумма всех покупок покупателя
+CREATE OR REPLACE FUNCTION get_total_spent(p_cust_id NUMBER)
+RETURN NUMBER
+IS
+    v_total NUMBER;
+BEGIN
+    SELECT NVL(SUM(total), 0) INTO v_total
+    FROM Orders
+    WHERE cust_id = p_cust_id;
+    
+    RETURN v_total;
+END;
+/
+
+
+
+-- Добавить товар в заказ
+CREATE OR REPLACE PROCEDURE add_to_cart(
+    p_order_id NUMBER,
+    p_prod_id NUMBER,
+    p_quantity NUMBER
+)
+IS
+    v_item_id NUMBER;
+    v_stock NUMBER;
+BEGIN
+    -- Проверяем остаток
+    SELECT stock INTO v_stock
+    FROM Product
+    WHERE prod_id = p_prod_id;
+    
+    IF v_stock < p_quantity THEN
+        DBMS_OUTPUT.PUT_LINE('Ошибка: осталось всего ' || v_stock);
+        RETURN;
+    END IF;
+    
+    -- Добавляем в корзину
+    SELECT NVL(MAX(item_id), 0) + 1 INTO v_item_id FROM Cart_Item;
+    
+    INSERT INTO Cart_Item VALUES (v_item_id, p_order_id, p_prod_id, p_quantity);
+    
+    -- Уменьшаем остаток
+    UPDATE Product SET stock = stock - p_quantity WHERE prod_id = p_prod_id;
+    
+    COMMIT;
+    DBMS_OUTPUT.PUT_LINE('Товар добавлен!');
+END;
+/
+
+-- Посмотреть, кто что купил
+SELECT * FROM Order_Info;
+
+-- Узнать, сколько потратил покупатель
+SELECT get_total_spent(1) FROM DUAL;
+
+-- Добавить товар в заказ
+BEGIN
+    add_to_cart(2, 1, 1);  -- в заказ №2 добавить 1 ноутбук
+END;
+/
+
+-- Проверить суммы заказов (обновятся автоматически)
+SELECT * FROM Orders;
+
+
+
+
+-- Автоматический подсчёт суммы заказа
+CREATE OR REPLACE TRIGGER calc_total
+AFTER INSERT OR UPDATE OR DELETE ON Cart_Item
+BEGIN
+    FOR rec IN (SELECT DISTINCT order_id FROM Cart_Item) LOOP
+        UPDATE Orders o
+        SET total = (
+            SELECT SUM(p.price * ci.quantity)
+            FROM Cart_Item ci
+            JOIN Product p ON ci.prod_id = p.prod_id
+            WHERE ci.order_id = rec.order_id
+        )
+        WHERE o.order_id = rec.order_id;
+    END LOOP;
+END;
+/
+
+
+-- Сумма всех покупок покупателя
+CREATE OR REPLACE FUNCTION get_total_spent(p_cust_id NUMBER)
+RETURN NUMBER
+IS
+    v_total NUMBER;
+BEGIN
+    SELECT NVL(SUM(total), 0) INTO v_total
+    FROM Orders
+    WHERE cust_id = p_cust_id;
+    
+    RETURN v_total;
+END;
+/
+
+
+-- Добавить товар в заказ
+CREATE OR REPLACE PROCEDURE add_to_cart(
+    p_order_id NUMBER,
+    p_prod_id NUMBER,
+    p_quantity NUMBER
+)
+IS
+    v_item_id NUMBER;
+    v_stock NUMBER;
+BEGIN
+    -- Проверяем остаток
+    SELECT stock INTO v_stock
+    FROM Product
+    WHERE prod_id = p_prod_id;
+    
+    IF v_stock < p_quantity THEN
+        DBMS_OUTPUT.PUT_LINE('Ошибка: осталось всего ' || v_stock);
+        RETURN;
+    END IF;
+    
+    -- Добавляем в корзину
+    SELECT NVL(MAX(item_id), 0) + 1 INTO v_item_id FROM Cart_Item;
+    
+    INSERT INTO Cart_Item VALUES (v_item_id, p_order_id, p_prod_id, p_quantity);
+    
+    -- Уменьшаем остаток
+    UPDATE Product SET stock = stock - p_quantity WHERE prod_id = p_prod_id;
+    
+    COMMIT;
+    DBMS_OUTPUT.PUT_LINE('Товар добавлен!');
+END;
+/
+
+
+
+-- Посмотреть, кто что купил
+SELECT * FROM Order_Info;
+
+-- Узнать, сколько потратил покупатель
+SELECT get_total_spent(1) FROM DUAL;
+
+-- Добавить товар в заказ
+BEGIN
+    add_to_cart(2, 1, 1);  -- в заказ №2 добавить 1 ноутбук
+END;
+/
+
+-- Проверить суммы заказов (обновятся автоматически)
+SELECT * FROM Orders;
